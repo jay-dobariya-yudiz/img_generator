@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #image-container {
+            margin-top: 20px;
+            padding: 10px;
+            display: inline-block; 
+            width: 520px;
+            height: 520px; 
+            overflow: hidden; 
+        }
+        img {
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; 
+        }
+        input[type="text"] {
+            width: 300px; 
+            padding: 5px;
+            margin-top: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>AI Image Generator</h1>
+    <form id="generate-form">
+        <input type="text" id="prompt" placeholder="Enter your prompt here..." required>
+        <button type="submit">Generate Image</button>
+    </form>
+
+    <div id="image-container">
+        <!-- Generated image will be displayed here -->
+    </div>
+
+    <script>
+        document.getElementById('generate-form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent the form from submitting traditionally
+
+            const prompt = document.getElementById('prompt').value;
+
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({ prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const imageContainer = document.getElementById('image-container');
+
+                // Clear previous images
+                imageContainer.innerHTML = '';
+
+                if (data.error) {
+                    imageContainer.innerHTML = `<p>Error: ${data.error}</p>`;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = data.image_url;
+                    img.alt = 'Generated Image';
+                    imageContainer.appendChild(img);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+
+</body>
+</html>
